@@ -1,0 +1,868 @@
+/* ============================================================
+   TABUADA POKÉMON v4 — CSS
+   ============================================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --red:         #DC2626;
+  --red-dark:    #991B1B;
+  --blue:        #2563EB;
+  --blue-dark:   #1E40AF;
+  --yellow:      #FBBF24;
+  --yellow-dark: #92400E;
+  --green:       #16A34A;
+  --purple:      #9333EA;
+  --card:        #FFFFFF;
+  --ink:         #1F2937;
+  --muted:       #6B7280;
+  --gray-light:  #F3F4F6;
+  --gray-border: #E5E7EB;
+
+  --type-normal:   #A8A878; --type-fire:     #F08030; --type-water:    #6890F0;
+  --type-electric: #F8D030; --type-grass:    #78C850; --type-ice:      #98D8D8;
+  --type-fighting: #C03028; --type-poison:   #A040A0; --type-ground:   #E0C068;
+  --type-flying:   #A890F0; --type-psychic:  #F85888; --type-bug:      #A8B820;
+  --type-rock:     #B8A038; --type-ghost:    #705898; --type-dragon:   #7038F8;
+  --type-fairy:    #EE99AC; --type-steel:    #B8B8D0; --type-dark:     #705848;
+}
+
+html, body { overscroll-behavior: contain; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.display { font-family: 'Fredoka One', cursive; }
+button   { font-family: inherit; cursor: pointer; }
+input    { font-family: inherit; }
+
+/* ============================================================
+   APP WRAPPER
+   ============================================================ */
+
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 14px 14px 0;
+}
+
+@media (max-width: 480px) { .app { padding: 10px 10px 0; } }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 22px;
+  color: var(--red);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+@media (max-width: 420px) { .title { font-size: 18px; } }
+
+.pokeball-icon {
+  width: 28px; height: 28px;
+  background: var(--red);
+  border-radius: 50%;
+  position: relative;
+  border: 3px solid var(--ink);
+  flex-shrink: 0;
+}
+.pokeball-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 3px;
+  background: var(--ink);
+  transform: translateY(-50%);
+}
+.pokeball-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 9px; height: 9px;
+  background: white;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.header-controls { display: flex; gap: 6px; align-items: center; }
+
+.icon-btn {
+  width: 36px; height: 36px;
+  border: 2px solid var(--gray-border);
+  background: white;
+  border-radius: 10px;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.icon-btn:hover { background: var(--gray-light); transform: translateY(-1px); }
+.icon-btn.active { background: var(--yellow); border-color: var(--yellow-dark); }
+
+/* ============================================================
+   GAME HUD  (lives + streak)
+   ============================================================ */
+
+.game-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 7px 12px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid var(--gray-border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.hud-lives {
+  display: flex;
+  gap: 2px;
+  font-size: 15px;
+  line-height: 1;
+  flex-wrap: nowrap;
+}
+
+.hud-streak {
+  font-family: 'Fredoka One', cursive;
+  font-size: 18px;
+  color: #92400E;
+  transition: color 0.2s;
+}
+
+.hud-streak.hot { animation: glow-text 0.8s ease-in-out infinite alternate; }
+
+@keyframes glow-text {
+  from { text-shadow: none; }
+  to   { text-shadow: 0 0 12px rgba(251,191,36,0.9); }
+}
+
+/* ============================================================
+   SHINY METER
+   ============================================================ */
+
+.shiny-meter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 5px 12px;
+  background: white;
+  border-radius: 10px;
+  border: 2px solid var(--gray-border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.shiny-meter-label { font-size: 15px; flex-shrink: 0; }
+
+.shiny-meter-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--gray-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.shiny-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FBBF24, #F59E0B);
+  border-radius: 4px;
+  transition: width 0.35s ease;
+  width: 0%;
+}
+
+.shiny-meter-fill.full {
+  animation: shimmer 0.7s ease-out;
+}
+
+@keyframes shimmer {
+  0%   { background: #FBBF24; }
+  40%  { background: white; }
+  100% { background: linear-gradient(90deg, #FBBF24, #F59E0B); }
+}
+
+.shiny-meter-count {
+  font-family: 'Fredoka One', cursive;
+  font-size: 13px;
+  color: var(--yellow-dark);
+  flex-shrink: 0;
+  min-width: 38px;
+  text-align: right;
+}
+
+/* ============================================================
+   PLAY AREA
+   ============================================================ */
+
+.play-area {
+  background: white;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.10);
+  border: 4px solid var(--red);
+  margin-bottom: 16px;
+}
+
+@media (max-width: 420px) {
+  .play-area { padding: 14px; border-radius: 16px; border-width: 3px; }
+}
+
+/* ============================================================
+   ENCOUNTER ZONE
+   ============================================================ */
+
+.encounter-zone {
+  text-align: center;
+  padding: 14px 12px 10px;
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  border-radius: 14px;
+  border: 3px dashed var(--blue);
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.pokemon-sprite-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 420px) { .pokemon-sprite-wrap { width: 110px; height: 110px; } }
+
+.pokemon-sprite {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  animation: bounce 1.6s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-9px); }
+}
+
+/* Pokéball capture animation */
+.pokeball-anim {
+  position: absolute;
+  width: 64px; height: 64px;
+  pointer-events: none;
+  opacity: 0;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.pokeball-anim.animating {
+  animation: capture 1.0s ease-in-out forwards;
+}
+@keyframes capture {
+  0%   { opacity: 0; transform: translate(-50%, 80px) rotate(0deg) scale(0.5); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+  40%  { transform: translate(-50%, -50%) rotate(380deg) scale(1.2); }
+  60%  { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+  80%  { transform: translate(-50%, -50%) rotate(380deg) scale(1.1); }
+  100% { opacity: 1; transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+}
+
+.pokemon-info { text-align: center; }
+
+.pokemon-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+@media (max-width: 420px) { .pokemon-name { font-size: 14px; } }
+
+.pokemon-num { color: var(--muted); font-weight: 600; font-size: 13px; }
+
+.shiny-tag {
+  display: inline-block;
+  background: linear-gradient(135deg, #FBBF24, #F59E0B);
+  color: white;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.pokemon-types { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; min-height: 20px; }
+
+.type-badge {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: white;
+  padding: 2px 9px;
+  border-radius: 9px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+  letter-spacing: 0.2px;
+}
+
+/* ============================================================
+   QUESTION
+   ============================================================ */
+
+.question {
+  font-size: 50px;
+  color: var(--ink);
+  text-align: center;
+  letter-spacing: 2px;
+  margin: 8px 0 10px;
+}
+@media (max-width: 420px) { .question { font-size: 38px; } }
+
+/* ============================================================
+   TIMER BAR  (hard mode)
+   ============================================================ */
+
+.timer-bar {
+  height: 16px;
+  background: var(--gray-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  position: relative;
+  border: 2px solid #D1D5DB;
+}
+
+.timer-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #16A34A, #FBBF24, #DC2626);
+  border-radius: 6px;
+  transition: width 0.9s linear;
+}
+.timer-fill.urgent { animation: urgent-pulse 0.5s ease-in-out infinite alternate; }
+@keyframes urgent-pulse { from { opacity: 1; } to { opacity: 0.65; } }
+
+.timer-text {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Fredoka One', cursive;
+  font-size: 11px;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+/* ============================================================
+   ANSWER INPUT
+   ============================================================ */
+
+.answer-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.answer-input {
+  width: 116px;
+  height: 58px;
+  font-size: 28px;
+  text-align: center;
+  border: 4px solid var(--blue);
+  border-radius: 12px;
+  font-family: 'Fredoka One', cursive;
+  color: var(--ink);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+}
+.answer-input::-webkit-outer-spin-button,
+.answer-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.answer-input:focus { border-color: var(--red); box-shadow: 0 0 0 4px rgba(220,38,38,0.15); }
+
+@media (max-width: 420px) { .answer-input { width: 96px; height: 52px; font-size: 24px; } }
+
+/* ── Buttons ── */
+.btn {
+  height: 58px;
+  padding: 0 22px;
+  font-size: 17px;
+  font-weight: 800;
+  font-family: 'Fredoka One', cursive;
+  background: var(--red);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 0 var(--red-dark);
+}
+.btn:hover   { transform: translateY(-2px); box-shadow: 0 6px 0 var(--red-dark); }
+.btn:active  { transform: translateY(2px);  box-shadow: 0 2px 0 var(--red-dark); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.btn.blue  { background: var(--blue);  box-shadow: 0 4px 0 var(--blue-dark); }
+.btn.blue:hover  { box-shadow: 0 6px 0 var(--blue-dark); }
+.btn.blue:active { box-shadow: 0 2px 0 var(--blue-dark); }
+.btn.gray  { background: #6B7280; box-shadow: 0 4px 0 #374151; }
+.btn.gray:hover  { box-shadow: 0 6px 0 #374151; }
+
+@media (max-width: 420px) { .btn { padding: 0 14px; font-size: 15px; height: 52px; } }
+
+/* ============================================================
+   FEEDBACK
+   ============================================================ */
+
+.feedback {
+  text-align: center;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.feedback.correct { background: #D1FAE5; color: #065F46; border: 2px solid var(--green); animation: pop-correct 0.35s; }
+.feedback.wrong   { background: #FEE2E2; color: var(--red-dark); border: 2px solid var(--red); animation: shake-wrong 0.4s; }
+.feedback.empty   { background: transparent; border: 2px solid transparent; }
+
+@keyframes pop-correct   { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+@keyframes shake-wrong   { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+
+/* ============================================================
+   POKÉDEX DRAWER
+   ============================================================ */
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.48);
+  z-index: 150;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s;
+}
+.drawer-backdrop.open { opacity: 1; pointer-events: all; }
+
+.pokedex-drawer {
+  position: fixed;
+  top: 0; right: -380px;
+  width: 360px;
+  height: 100%;
+  background: white;
+  z-index: 200;
+  box-shadow: -4px 0 28px rgba(0,0,0,0.18);
+  border-left: 4px solid var(--red);
+  display: flex;
+  flex-direction: column;
+  transition: right 0.28s ease;
+}
+.pokedex-drawer.open { right: 0; }
+
+@media (max-width: 480px) {
+  .pokedex-drawer { width: 100vw; right: -100vw; }
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 14px 10px;
+  border-bottom: 2px solid var(--gray-border);
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 17px;
+  color: var(--red);
+}
+.drawer-close {
+  width: 30px; height: 30px;
+  background: var(--gray-light);
+  border: none;
+  border-radius: 50%;
+  font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  cursor: pointer;
+}
+.drawer-close:hover { background: var(--gray-border); }
+
+.pokedex-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  padding: 8px;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+}
+.pokedex-grid::-webkit-scrollbar       { width: 6px; }
+.pokedex-grid::-webkit-scrollbar-track { background: var(--gray-border); }
+.pokedex-grid::-webkit-scrollbar-thumb { background: var(--red); border-radius: 4px; }
+
+@media (max-width: 480px) {
+  .pokedex-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* Pokédex slots */
+.pokedex-slot {
+  background: var(--gray-border);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  padding: 3px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 78px;
+  position: relative;
+  transition: transform 0.12s;
+}
+.pokedex-slot.captured {
+  cursor: pointer;
+  background: white;
+  border-color: var(--yellow);
+  animation: pop-slot 0.4s ease-out;
+}
+.pokedex-slot.captured:hover  { transform: translateY(-2px) scale(1.05); }
+.pokedex-slot.captured:active { transform: scale(0.95); }
+.pokedex-slot.shiny {
+  background: linear-gradient(135deg, #FEF3C7, #FBBF24);
+  border-color: #F59E0B;
+  box-shadow: 0 0 10px rgba(251,191,36,0.55);
+}
+.pokedex-slot.shiny::after {
+  content: '✨';
+  position: absolute;
+  top: -4px; right: -4px;
+  font-size: 11px;
+}
+
+.slot-num  { font-size: 9px; color: var(--muted); font-weight: 700; line-height: 1; margin-bottom: 2px; }
+.slot-img  { width: 100%; height: 40px; display: flex; align-items: center; justify-content: center; }
+.slot-img img { max-width: 100%; max-height: 100%; image-rendering: pixelated; }
+.slot-q    { font-family: 'Fredoka One', cursive; font-size: 24px; color: #9CA3AF; line-height: 1; }
+.slot-name { font-size: 8px; font-weight: 700; color: var(--muted); text-align: center; line-height: 1.1; margin-top: 2px; word-break: break-word; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.pokedex-slot.captured .slot-name { color: var(--ink); }
+.pokedex-slot.shiny .slot-name    { color: var(--yellow-dark); }
+
+@keyframes pop-slot { 0% { transform: scale(0); } 70% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+
+.badges {
+  padding: 10px 10px 0;
+  flex-shrink: 0;
+  border-top: 2px solid var(--gray-border);
+}
+.badges-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #5B21B6;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.badges-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 8px; }
+
+.badge {
+  aspect-ratio: 1;
+  background: white;
+  border: 2px solid var(--gray-border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px;
+  filter: grayscale(100%) opacity(0.35);
+  transition: filter 0.3s, box-shadow 0.3s;
+  position: relative;
+  cursor: default;
+}
+.badge.earned {
+  filter: none;
+  border-color: var(--purple);
+  background: linear-gradient(135deg, #F5F3FF, #DDD6FE);
+  box-shadow: 0 0 7px rgba(147,51,234,0.4);
+}
+.badge-tooltip {
+  position: absolute;
+  bottom: 110%; left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 10;
+}
+.badge:hover .badge-tooltip { opacity: 1; }
+
+/* ============================================================
+   BEST SCORES  (in drawer)
+   ============================================================ */
+
+.best-scores {
+  padding: 8px 10px;
+  border-top: 2px solid var(--gray-border);
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.best-row {
+  flex: 1;
+  background: #FEF3C7;
+  border: 2px solid var(--yellow);
+  border-radius: 10px;
+  padding: 7px;
+  text-align: center;
+}
+.best-label { font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--yellow-dark); display: block; margin-bottom: 2px; }
+.best-value { font-size: 20px; color: var(--yellow-dark); }
+
+.teacher-btn {
+  margin: 6px 10px 10px;
+  width: calc(100% - 20px);
+  height: 38px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   OVERLAYS / MODALS
+   ============================================================ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+  animation: fadeIn 0.25s;
+  overflow-y: auto;
+}
+.overlay.pokemon-detail { z-index: 250; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: white;
+  border-radius: 22px;
+  padding: 26px;
+  max-width: 490px;
+  width: 100%;
+  text-align: center;
+  border: 6px solid var(--red);
+  box-shadow: 0 18px 56px rgba(0,0,0,0.38);
+  animation: slideUp 0.35s ease-out;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+@media (max-width: 480px) { .modal { padding: 16px; border-width: 4px; border-radius: 18px; } }
+
+@keyframes slideUp { from { transform: translateY(36px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-sprite {
+  width: 140px; height: 140px;
+  image-rendering: pixelated;
+  margin: 0 auto 12px;
+  display: block;
+}
+@media (max-width: 480px) { .modal-sprite { width: 110px; height: 110px; } }
+.modal-sprite.fainted { filter: grayscale(100%) brightness(0.65); transform: rotate(180deg); }
+
+.modal-title    { font-family: 'Fredoka One', cursive; font-size: 26px; color: var(--red); margin-bottom: 6px; }
+.modal-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 16px; font-weight: 600; }
+
+@media (max-width: 480px) { .modal-title { font-size: 21px; } }
+
+.modal-stats {
+  background: var(--gray-light);
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.modal-stat-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+.modal-stat-value { font-family: 'Fredoka One', cursive; font-size: 20px; color: var(--ink); }
+
+/* ============================================================
+   MODE SELECTOR
+   ============================================================ */
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+@media (max-width: 400px) { .mode-grid { grid-template-columns: 1fr; } }
+
+.mode-card {
+  background: white;
+  border: 3px solid var(--gray-border);
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+.mode-card:hover   { border-color: var(--red); transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.1); }
+.mode-card.selected { border-color: var(--red); background: #FEE2E2; }
+
+.mode-card-icon  { font-size: 24px; margin-bottom: 3px; }
+.mode-card-title { font-family: 'Fredoka One', cursive; font-size: 14px; color: var(--ink); }
+.mode-card-desc  { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+.modal-rules {
+  background: #DBEAFE;
+  border: 2px solid var(--blue);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 14px;
+  text-align: left;
+  font-size: 13px;
+}
+.modal-rules ul { list-style: none; }
+.modal-rules li { padding: 3px 0; }
+.modal-rules li::before { content: '▸ '; color: var(--red); font-weight: bold; }
+
+/* ============================================================
+   RESULT CHART
+   ============================================================ */
+
+.result-chart {
+  background: var(--gray-light);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  text-align: left;
+}
+.result-chart-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; text-align: center; }
+.result-chart-row   { display: grid; grid-template-columns: 50px 1fr 38px; align-items: center; gap: 7px; margin-bottom: 4px; font-size: 12px; }
+.result-chart-label { font-weight: 700; color: var(--ink); }
+.result-chart-bar   { height: 11px; background: var(--gray-border); border-radius: 6px; overflow: hidden; }
+.result-chart-fill  { height: 100%; background: linear-gradient(90deg, var(--green), var(--red)); border-radius: 6px; transition: width 0.6s ease; }
+.result-chart-fill.no-errors { background: var(--green); }
+.result-chart-count { font-weight: 700; color: var(--red); text-align: right; }
+.result-chart-count.zero { color: var(--green); }
+
+/* ============================================================
+   POKÉMON DETAIL MODAL
+   ============================================================ */
+
+.poke-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.poke-modal-num    { font-family: 'Fredoka One', cursive; font-size: 17px; color: var(--muted); }
+.poke-modal-close  {
+  width: 30px; height: 30px;
+  background: var(--gray-light); border: none; border-radius: 50%;
+  font-size: 18px; display: flex; align-items: center; justify-content: center;
+  color: var(--muted); cursor: pointer;
+}
+.poke-modal-close:hover { background: var(--gray-border); }
+.poke-modal-name { font-family: 'Fredoka One', cursive; font-size: 24px; color: var(--ink); margin-bottom: 4px; }
+.poke-modal-desc {
+  background: var(--gray-light); border-radius: 10px; padding: 11px;
+  font-size: 13px; line-height: 1.5; color: var(--ink);
+  margin: 10px 0; text-align: left; font-style: italic;
+}
+.poke-modal-data { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.poke-data-item  { background: var(--gray-light); border-radius: 10px; padding: 9px; text-align: left; }
+.poke-data-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+.poke-data-value { font-family: 'Fredoka One', cursive; font-size: 17px; color: var(--ink); margin-top: 2px; }
+
+.loading-spinner {
+  display: inline-block;
+  width: 17px; height: 17px;
+  border: 3px solid var(--gray-border);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   TEACHER MODE
+   ============================================================ */
+
+.teacher-tabs  { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 2px solid var(--gray-border); }
+.teacher-tab   { padding: 6px 13px; background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.teacher-tab.active { color: var(--red); border-bottom-color: var(--red); }
+.teacher-panel { text-align: left; font-size: 13px; }
+.teacher-panel.hidden { display: none; }
+.teacher-section { margin-bottom: 12px; }
+.teacher-section h4 { font-size: 10px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-weight: 700; }
+.teacher-stat-grid  { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.teacher-action-row { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.confirm-text { background: #FEE2E2; border: 2px solid var(--red); border-radius: 10px; padding: 10px; font-size: 12px; margin-top: 8px; display: none; }
+.confirm-text.visible { display: block; }
+.password-input {
+  width: 100%; padding: 11px; font-size: 18px;
+  border: 3px solid var(--blue); border-radius: 12px;
+  text-align: center; font-family: 'Fredoka One', cursive; outline: none;
+}
+.password-input.error { border-color: var(--red); animation: shake-wrong 0.4s; }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+.toast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  background: linear-gradient(135deg, #FBBF24, #F59E0B);
+  color: white;
+  padding: 10px 22px;
+  border-radius: 22px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 16px;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.28);
+  z-index: 500;
+  opacity: 0;
+  transition: all 0.35s ease-out;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.shiny-toast { background: linear-gradient(135deg, #F59E0B, #F97316); }
+.toast.error-toast { background: linear-gradient(135deg, #DC2626, #991B1B); }
