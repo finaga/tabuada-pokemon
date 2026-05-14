@@ -390,7 +390,7 @@ function renderPokedex(newPid) {
       var slot = document.createElement('div');
       slot.className = 'pokedex-slot';
       slot.dataset.id = id;
-      if (id === newPid) { slot.classList.add('new-capture'); newSlotRef = slot; }
+      if (id === newPid) { newSlotRef = slot; }
 
       var numEl = document.createElement('div');
       numEl.className = 'slot-num';
@@ -432,8 +432,12 @@ function renderPokedex(newPid) {
   $('bestCaught').textContent   = state.bestCaught  || 0;
 
   if (newSlotRef) {
+    var slotToAnimate = newSlotRef;
     setTimeout(function() {
-      newSlotRef.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      slotToAnimate.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      setTimeout(function() {
+        slotToAnimate.classList.add('new-capture');
+      }, 420);
     }, 80);
   }
 }
