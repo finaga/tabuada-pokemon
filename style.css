@@ -81,13 +81,24 @@ input    { font-family: inherit; }
     right: auto !important;
     width: 320px !important;
     flex-shrink: 0;
-    height: calc(100vh - 28px);
+    height: calc(100vh - 28px) !important;
+    overflow: hidden;
     border: 3px solid var(--red);
     border-left: 3px solid var(--red) !important;
     border-radius: 20px;
     box-shadow: 0 8px 28px rgba(0,0,0,0.10);
     transform: none !important;
     transition: none !important;
+  }
+
+  /* Grid fills remaining space and scrolls internally */
+  .pokedex-grid {
+    min-height: 0;
+  }
+
+  /* Bottom sections always visible */
+  .badges, .best-scores, .teacher-btn {
+    flex-shrink: 0;
   }
 
   .drawer-backdrop { display: none !important; }

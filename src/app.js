@@ -384,12 +384,13 @@ function renderPokedex(newPid) {
   var grid = $('pokedexGrid');
   grid.innerHTML = '';
   var count = 0;
+  var newSlotRef = null;
   for (var i = 1; i <= 151; i++) {
     (function(id) {
       var slot = document.createElement('div');
       slot.className = 'pokedex-slot';
       slot.dataset.id = id;
-      if (id === newPid) slot.classList.add('new-capture');
+      if (id === newPid) { slot.classList.add('new-capture'); newSlotRef = slot; }
 
       var numEl = document.createElement('div');
       numEl.className = 'slot-num';
@@ -429,6 +430,12 @@ function renderPokedex(newPid) {
   $('pokedexCount').textContent = count;
   $('bestStreak').textContent   = state.bestStreak || 0;
   $('bestCaught').textContent   = state.bestCaught  || 0;
+
+  if (newSlotRef) {
+    setTimeout(function() {
+      newSlotRef.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }, 80);
+  }
 }
 
 function renderBadges() {
