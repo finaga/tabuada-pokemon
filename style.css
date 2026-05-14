@@ -578,13 +578,22 @@ input    { font-family: inherit; }
 .pokedex-grid { perspective: 900px; }
 
 .pokedex-slot.new-capture {
-  animation: card-flip 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) both !important;
+  animation:
+    card-flip 0.65s cubic-bezier(0.34, 1.5, 0.64, 1) both,
+    card-glow 0.85s ease-out both !important;
 }
 
 @keyframes card-flip {
-  0%   { transform: rotateY(90deg) scale(0.7); opacity: 0; }
-  60%  { transform: rotateY(-8deg) scale(1.08); opacity: 1; }
-  100% { transform: rotateY(0deg)  scale(1);    opacity: 1; }
+  0%   { transform: rotateY(90deg) scale(0.55); opacity: 0; }
+  45%  { transform: rotateY(-14deg) scale(1.18); opacity: 1; }
+  70%  { transform: rotateY(5deg)  scale(1.06); }
+  100% { transform: rotateY(0deg)  scale(1); }
+}
+
+@keyframes card-glow {
+  0%   { box-shadow: 0 0 0 0   rgba(251,191,36,0); }
+  40%  { box-shadow: 0 0 0 6px rgba(251,191,36,0.9), 0 0 28px 6px rgba(251,191,36,0.45); }
+  100% { box-shadow: 0 0 0 0   rgba(251,191,36,0); }
 }
 
 .drawer-header {
