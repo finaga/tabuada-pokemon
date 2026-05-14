@@ -581,7 +581,10 @@ function renderQuestion() {
   input.value    = '';
   input.disabled = false;
   $('submitBtn').disabled = false;
-  setTimeout(function() { input.focus(); }, 50);
+  setTimeout(function() {
+    input.focus();
+    input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, 100);
 
   session.questionStartTime = performance.now();
   if (session.mode === 'hardmode') startTimer();
@@ -1056,6 +1059,18 @@ function init() {
 
   // Prevent iOS zoom on input focus
   $('answer').addEventListener('focus', function() { document.body.style.fontSize = '16px'; });
+
+  // Scroll answer into view when keyboard opens (iOS visualViewport)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function() {
+      var input = $('answer');
+      if (document.activeElement === input) {
+        setTimeout(function() {
+          input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }, 50);
+      }
+    });
+  }
 }
 
 if (document.readyState === 'loading') {

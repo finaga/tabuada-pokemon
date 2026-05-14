@@ -48,10 +48,10 @@ input    { font-family: inherit; }
 .app {
   max-width: 560px;
   margin: 0 auto;
-  padding: 14px 14px 0;
+  padding: 14px 14px 120px;
 }
 
-@media (max-width: 480px) { .app { padding: 10px 10px 0; } }
+@media (max-width: 480px) { .app { padding: 10px 10px 120px; } }
 
 /* ============================================================
    HEADER
