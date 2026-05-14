@@ -583,7 +583,7 @@ function renderQuestion() {
   $('submitBtn').disabled = false;
   setTimeout(function() {
     input.focus();
-    input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    $('playArea').scrollIntoView({ block: 'start', behavior: 'smooth' });
   }, 100);
 
   session.questionStartTime = performance.now();
@@ -1066,7 +1066,7 @@ function init() {
       var input = $('answer');
       if (document.activeElement === input) {
         setTimeout(function() {
-          input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          $('playArea').scrollIntoView({ block: 'start', behavior: 'smooth' });
         }, 50);
       }
     });
