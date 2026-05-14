@@ -14,6 +14,7 @@
 <!-- ============================================================
      APP
 ============================================================ -->
+<div class="game-wrap">
 <div class="app">
 
   <header class="header">
@@ -22,7 +23,6 @@
       Tabuada Pokémon
     </h1>
     <div class="header-controls">
-      <button class="icon-btn" id="pokedexBtn" title="Pokédex">📕</button>
       <button class="icon-btn" id="muteBtn"    title="Som">🔊</button>
       <button class="icon-btn" id="homeBtn"    title="Início" style="display:none;">🏠</button>
     </div>
@@ -92,10 +92,7 @@
 
 </div>
 
-<!-- ============================================================
-     POKÉDEX DRAWER
-============================================================ -->
-<div class="drawer-backdrop"  id="drawerBackdrop"></div>
+<!-- Pokédex sidebar (desktop: always visible; mobile: slide-in drawer) -->
 <aside class="pokedex-drawer" id="pokedexDrawer">
   <div class="drawer-header">
     <div class="drawer-title">📕 Pokédex — <span id="pokedexCount">0</span>/151</div>
@@ -118,6 +115,9 @@
   </div>
   <button class="btn gray teacher-btn" id="teacherModeBtn">👨‍🏫 Modo Professor</button>
 </aside>
+</div><!-- /.game-wrap -->
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
 
 <!-- ============================================================
      START SCREEN
@@ -300,6 +300,11 @@
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- Mobile bottom nav (hidden on desktop via CSS) -->
+<div class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav-btn" id="pokedexNavBtn">📕 Pokédex</button>
+</div>
 
 <script defer src="src/app.js"></script>
 </body>

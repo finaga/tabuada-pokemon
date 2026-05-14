@@ -380,7 +380,7 @@ function renderResultChart(containerId, errorMap, totalMap) {
 
 // ── Pokédex render ────────────────────────────────────────────
 
-function renderPokedex() {
+function renderPokedex(newPid) {
   var grid = $('pokedexGrid');
   grid.innerHTML = '';
   var count = 0;
@@ -389,6 +389,7 @@ function renderPokedex() {
       var slot = document.createElement('div');
       slot.className = 'pokedex-slot';
       slot.dataset.id = id;
+      if (id === newPid) slot.classList.add('new-capture');
 
       var numEl = document.createElement('div');
       numEl.className = 'slot-num';
@@ -448,12 +449,16 @@ function renderBadges() {
 // ── Pokédex drawer ────────────────────────────────────────────
 
 function openDrawer() {
+  if (window.innerWidth >= 768) return;
   $('pokedexDrawer').classList.add('open');
   $('drawerBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 function closeDrawer() {
+  if (window.innerWidth >= 768) return;
   $('pokedexDrawer').classList.remove('open');
   $('drawerBackdrop').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ── Pokémon detail modal ──────────────────────────────────────
@@ -685,7 +690,7 @@ function handleCorrect(q) {
   fb.className = 'feedback correct';
   fb.innerHTML = '✅ Você capturou ' + getPokemonName(pid) + (isShiny ? ' ✨ SHINY ✨' : '') + '!';
 
-  renderPokedex();
+  renderPokedex(isNew ? pid : null);
   checkAndAwardBadges(session);
   renderBadges();
   save();
@@ -1009,7 +1014,7 @@ function init() {
   });
 
   // Pokédex drawer
-  $('pokedexBtn').addEventListener('click', function() { renderPokedex(); openDrawer(); });
+  $('pokedexNavBtn').addEventListener('click', function() { renderPokedex(); openDrawer(); });
   $('drawerClose').addEventListener('click', closeDrawer);
   $('drawerBackdrop').addEventListener('click', closeDrawer);
 
