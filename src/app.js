@@ -56,6 +56,13 @@ function loadState() {
 
 const state = loadState();
 
+// Clear cached descriptions if they were stored in English
+if (state.descLang !== 'pt-br') {
+  state.pokemonCache = {};
+  state.descLang = 'pt-br';
+  save();
+}
+
 function save() {
   try { localStorage.setItem(V4_KEY, JSON.stringify(state)); } catch(_) { /* */ }
 }
@@ -207,7 +214,8 @@ function fetchPokemonData(id) {
     var poke    = data[0];
     var species = data[1];
     var entries = species.flavor_text_entries || [];
-    var entry   = entries.find(function(e) { return e.language.name === 'en'; });
+    var entry   = entries.find(function(e) { return e.language.name === 'pt-br'; })
+                || entries.find(function(e) { return e.language.name === 'en'; });
     var desc    = entry ? entry.flavor_text.replace(/[\f\n\r]/g, ' ').replace(/\s+/g, ' ').trim() : '';
     var result  = {
       types:       poke.types.map(function(t) { return t.type.name; }),
@@ -477,15 +485,23 @@ function closeDrawer() {
 function openPokemonModal(id) {
   if (!state.pokedex[id]) return;
   var captured = state.pokedex[id];
+  var isShiny  = !!captured.shiny;
+
   $('pdNum').textContent    = '#' + pad3(id);
   $('pdName').textContent   = getPokemonName(id);
-  $('pdSprite').src         = spriteUrl(id, captured.shiny);
+  $('pdSprite').src         = spriteUrl(id, isShiny);
   $('pdDesc').innerHTML     = '<span class="loading-spinner"></span> Carregando...';
   $('pdHeight').textContent = '—';
   $('pdWeight').textContent = '—';
   $('pdTypes').innerHTML    = '';
   $('pdCryBtn').onclick     = function() { playCry(id); };
-  $('pokemonDetailOverlay').style.display = 'flex';
+
+  var overlay = $('pokemonDetailOverlay');
+  overlay.classList.toggle('shiny-modal', isShiny);
+  var shinyTag = $('pdShinyTag');
+  shinyTag.style.display = isShiny ? 'block' : 'none';
+
+  overlay.style.display = 'flex';
 
   fetchPokemonData(id).then(function(data) {
     if (!data) {
