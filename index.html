@@ -20,9 +20,10 @@
   <header class="header">
     <h1 class="title display">
       <span class="pokeball-icon"></span>
-      Tabuada Pokémon
+      <span data-i18n="appTitle">Tabuada Pokémon</span>
     </h1>
     <div class="header-controls">
+      <button class="icon-btn lang-btn" id="langBtn" title="Language">PT</button>
       <button class="icon-btn" id="muteBtn"    title="Som">🔊</button>
       <button class="icon-btn" id="homeBtn"    title="Início" style="display:none;">🏠</button>
     </div>
@@ -84,7 +85,7 @@
         autocomplete="off"
         inputmode="numeric"
       >
-      <button class="btn" id="submitBtn">Capturar!</button>
+      <button class="btn" id="submitBtn" data-i18n="catchBtn">Capturar!</button>
     </div>
 
     <div class="feedback empty" id="feedback">&nbsp;</div>
@@ -95,25 +96,25 @@
 <!-- Pokédex sidebar (desktop: always visible; mobile: slide-in drawer) -->
 <aside class="pokedex-drawer" id="pokedexDrawer">
   <div class="drawer-header">
-    <div class="drawer-title">📕 Pokédex — <span id="pokedexCount">0</span>/151</div>
+    <div class="drawer-title">📕 <span data-i18n="pokedexLabel">Pokédex</span> — <span id="pokedexCount">0</span>/151</div>
     <button class="drawer-close" id="drawerClose">✕</button>
   </div>
   <div class="pokedex-grid" id="pokedexGrid"></div>
   <div class="badges">
-    <div class="badges-title">🏅 Medalhas</div>
+    <div class="badges-title" data-i18n="medalsTitle">🏅 Medalhas</div>
     <div class="badges-grid" id="badgesGrid"></div>
   </div>
   <div class="best-scores">
     <div class="best-row">
-      <span class="best-label">🔥 Melhor combo</span>
+      <span class="best-label" data-i18n="bestCombo">🔥 Melhor combo</span>
       <span class="best-value display"><span id="bestStreak">0</span></span>
     </div>
     <div class="best-row">
-      <span class="best-label">⚡ Melhor captura</span>
+      <span class="best-label" data-i18n="bestCaught">⚡ Melhor captura</span>
       <span class="best-value display"><span id="bestCaught">0</span></span>
     </div>
   </div>
-  <button class="btn gray teacher-btn" id="teacherModeBtn">👨‍🏫 Modo Professor</button>
+  <button class="btn gray teacher-btn" id="teacherModeBtn" data-i18n="teacherBtn">👨‍🏫 Modo Professor</button>
 </aside>
 </div><!-- /.game-wrap -->
 
@@ -124,34 +125,27 @@
 ============================================================ -->
 <div class="overlay" id="startOverlay">
   <div class="modal">
+    <button class="icon-btn lang-btn modal-lang-btn" id="langBtnStart" title="Language">PT</button>
     <img class="modal-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="Pikachu">
-    <h2 class="modal-title">Tabuada Pokémon!</h2>
-    <p class="modal-subtitle">Escolha seu modo de jogo, Sofia!</p>
+    <h2 class="modal-title" data-i18n="startTitle">Tabuada Pokémon!</h2>
+    <p class="modal-subtitle" data-i18n="chooseMode">Escolha seu modo de jogo, Sofia!</p>
 
     <div class="mode-grid">
       <div class="mode-card selected" data-mode="adventure" id="modeAdventure">
         <div class="mode-card-icon">🗺️</div>
-        <div class="mode-card-title">Aventura</div>
-        <div class="mode-card-desc">Modo infinito · 10 erros = Game Over</div>
+        <div class="mode-card-title" data-i18n="modeAdventureTitle">Aventura</div>
+        <div class="mode-card-desc" data-i18n="modeAdventureDesc">Modo infinito · 5 erros = Game Over</div>
       </div>
       <div class="mode-card" data-mode="hardmode" id="modeHard">
         <div class="mode-card-icon">🏋️</div>
-        <div class="mode-card-title">Gym Leader</div>
-        <div class="mode-card-desc">Cronômetro 10s · Mais divisões · +Shiny!</div>
+        <div class="mode-card-title" data-i18n="modeHardTitle">Gym Leader</div>
+        <div class="mode-card-desc" data-i18n="modeHardDesc">Cronômetro 10s · Mais divisões · +Shiny!</div>
       </div>
     </div>
 
-    <div class="modal-rules" id="modeRules">
-      <strong>Modo Aventura:</strong>
-      <ul>
-        <li>Contas infinitas de multiplicação e divisão</li>
-        <li>Acertou? <strong>Capturou o Pokémon!</strong></li>
-        <li>10 seguidas = próximo Pokémon é <strong>✨ SHINY!</strong></li>
-        <li>Errou <strong>10 vezes</strong>? Game Over!</li>
-      </ul>
-    </div>
+    <div class="modal-rules" id="modeRules"></div>
 
-    <button class="btn" id="startBtn" style="width:100%;">Começar Aventura!</button>
+    <button class="btn" id="startBtn" style="width:100%;" data-i18n="startAdvBtn">Começar Aventura!</button>
   </div>
 </div>
 
@@ -162,32 +156,32 @@
   <div class="modal">
     <img class="modal-sprite fainted" id="faintedSprite"
          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="">
-    <h2 class="modal-title">Seus Pokémons desmaiaram! 😵</h2>
-    <p class="modal-subtitle">Volte ao Centro Pokémon e tente de novo!</p>
+    <h2 class="modal-title" data-i18n="faintedTitle">Seus Pokémons desmaiaram! 😵</h2>
+    <p class="modal-subtitle" data-i18n="faintedSub">Volte ao Centro Pokémon e tente de novo!</p>
     <div class="modal-stats">
       <div>
-        <div class="modal-stat-label">Capturados</div>
+        <div class="modal-stat-label" data-i18n="statCaught">Capturados</div>
         <div class="modal-stat-value" id="goCaught">0</div>
       </div>
       <div>
-        <div class="modal-stat-label">Maior Combo</div>
+        <div class="modal-stat-label" data-i18n="statStreak">Maior Combo</div>
         <div class="modal-stat-value" id="goStreak">0</div>
       </div>
       <div>
-        <div class="modal-stat-label">Contas</div>
+        <div class="modal-stat-label" data-i18n="statTotal">Contas</div>
         <div class="modal-stat-value" id="goTotal">0</div>
       </div>
       <div>
-        <div class="modal-stat-label">Tempo Médio</div>
+        <div class="modal-stat-label" data-i18n="statTime">Tempo Médio</div>
         <div class="modal-stat-value" id="goTime">—</div>
       </div>
     </div>
     <div class="result-chart">
-      <div class="result-chart-title">Erros por tabuada</div>
+      <div class="result-chart-title" data-i18n="errorsPerTable">Erros por tabuada</div>
       <div id="goChart"></div>
     </div>
-    <button class="btn"  id="restartBtn" style="width:100%;">Tentar de Novo</button>
-    <button class="btn gray" id="goHomeBtn" style="width:100%;margin-top:8px;">Voltar ao Menu</button>
+    <button class="btn"  id="restartBtn" style="width:100%;" data-i18n="retryBtn">Tentar de Novo</button>
+    <button class="btn gray" id="goHomeBtn" style="width:100%;margin-top:8px;" data-i18n="backHomeBtn">Voltar ao Menu</button>
   </div>
 </div>
 
@@ -205,19 +199,19 @@
     <div id="pdShinyTag" class="shiny-tag modal-shiny-tag" style="display:none;">✨ SHINY</div>
     <div class="pokemon-types" id="pdTypes" style="margin-bottom:8px;justify-content:center;"></div>
     <div class="poke-modal-desc" id="pdDesc">
-      <span class="loading-spinner"></span> Carregando...
+      <span class="loading-spinner"></span> <span data-i18n="loading">Carregando...</span>
     </div>
     <div class="poke-modal-data">
       <div class="poke-data-item">
-        <div class="poke-data-label">Altura</div>
+        <div class="poke-data-label" data-i18n="height">Altura</div>
         <div class="poke-data-value" id="pdHeight">—</div>
       </div>
       <div class="poke-data-item">
-        <div class="poke-data-label">Peso</div>
+        <div class="poke-data-label" data-i18n="weight">Peso</div>
         <div class="poke-data-value" id="pdWeight">—</div>
       </div>
     </div>
-    <button class="btn blue" id="pdCryBtn" style="width:100%;margin-top:12px;height:46px;font-size:15px;">
+    <button class="btn blue" id="pdCryBtn" style="width:100%;margin-top:12px;height:46px;font-size:15px;" data-i18n="cryBtn">
       🔊 Ouvir grito
     </button>
   </div>
@@ -228,12 +222,12 @@
 ============================================================ -->
 <div class="overlay" id="teacherPwOverlay" style="display:none;">
   <div class="modal" style="border-color:var(--purple);max-width:360px;">
-    <h2 class="modal-title" style="color:var(--purple);">👨‍🏫 Modo Professor</h2>
-    <p class="modal-subtitle">Digite a senha para acessar.</p>
-    <input type="password" class="password-input" id="teacherPwInput" placeholder="Senha">
+    <h2 class="modal-title" style="color:var(--purple);" data-i18n="teacherPwTitle">👨‍🏫 Modo Professor</h2>
+    <p class="modal-subtitle" data-i18n="teacherPwSub">Digite a senha para acessar.</p>
+    <input type="password" class="password-input" id="teacherPwInput" data-i18n-placeholder="pwPlaceholder" placeholder="Senha">
     <div style="display:flex;gap:8px;margin-top:14px;">
-      <button class="btn gray" id="teacherPwCancel" style="flex:1;">Cancelar</button>
-      <button class="btn blue" id="teacherPwOk"     style="flex:1;">Entrar</button>
+      <button class="btn gray" id="teacherPwCancel" style="flex:1;" data-i18n="cancelBtn">Cancelar</button>
+      <button class="btn blue" id="teacherPwOk"     style="flex:1;" data-i18n="enterBtn">Entrar</button>
     </div>
   </div>
 </div>
@@ -243,32 +237,32 @@
 ============================================================ -->
 <div class="overlay" id="teacherOverlay" style="display:none;">
   <div class="modal" style="border-color:var(--purple);max-width:540px;">
-    <h2 class="modal-title" style="color:var(--purple);">📊 Painel do Professor</h2>
+    <h2 class="modal-title" style="color:var(--purple);" data-i18n="panelTitle">📊 Painel do Professor</h2>
 
     <div class="teacher-tabs">
-      <button class="teacher-tab active" data-tab="stats">Estatísticas</button>
-      <button class="teacher-tab"        data-tab="data">Dados</button>
+      <button class="teacher-tab active" data-tab="stats" data-i18n="tabStats">Estatísticas</button>
+      <button class="teacher-tab"        data-tab="data"  data-i18n="tabData">Dados</button>
     </div>
 
     <!-- Stats tab -->
     <div class="teacher-panel" id="teacherStats">
       <div class="teacher-section">
-        <h4>Resumo Geral</h4>
+        <h4 data-i18n="overall">Resumo Geral</h4>
         <div class="teacher-stat-grid">
-          <div class="poke-data-item"><div class="poke-data-label">Sessões</div><div class="poke-data-value" id="tmSessions">0</div></div>
-          <div class="poke-data-item"><div class="poke-data-label">Total respostas</div><div class="poke-data-value" id="tmTotal">0</div></div>
-          <div class="poke-data-item"><div class="poke-data-label">Taxa de acerto</div><div class="poke-data-value" id="tmAccuracy">—</div></div>
-          <div class="poke-data-item"><div class="poke-data-label">Tempo médio</div><div class="poke-data-value" id="tmAvgTime">—</div></div>
+          <div class="poke-data-item"><div class="poke-data-label" data-i18n="sessions">Sessões</div><div class="poke-data-value" id="tmSessions">0</div></div>
+          <div class="poke-data-item"><div class="poke-data-label" data-i18n="totalAnswers">Total respostas</div><div class="poke-data-value" id="tmTotal">0</div></div>
+          <div class="poke-data-item"><div class="poke-data-label" data-i18n="accuracy">Taxa de acerto</div><div class="poke-data-value" id="tmAccuracy">—</div></div>
+          <div class="poke-data-item"><div class="poke-data-label" data-i18n="avgTime">Tempo médio</div><div class="poke-data-value" id="tmAvgTime">—</div></div>
         </div>
       </div>
       <div class="teacher-section">
-        <h4>Erros por Tabuada (histórico)</h4>
+        <h4 data-i18n="errorsHist">Erros por Tabuada (histórico)</h4>
         <div class="result-chart" style="background:transparent;padding:0;margin-bottom:0;">
           <div id="tmTablesChart"></div>
         </div>
       </div>
       <div class="teacher-section">
-        <h4>Últimas 5 Sessões</h4>
+        <h4 data-i18n="last5">Últimas 5 Sessões</h4>
         <div id="tmSessionList"></div>
       </div>
     </div>
@@ -276,26 +270,26 @@
     <!-- Data tab -->
     <div class="teacher-panel hidden" id="teacherData">
       <div class="teacher-section">
-        <h4>Gerenciar dados</h4>
+        <h4 data-i18n="manageData">Gerenciar dados</h4>
         <div class="teacher-action-row">
-          <button class="btn blue" id="tmExportBtn" style="height:42px;font-size:13px;">📥 Exportar progresso</button>
-          <button class="btn blue" id="tmImportBtn" style="height:42px;font-size:13px;">📤 Importar progresso</button>
+          <button class="btn blue" id="tmExportBtn" style="height:42px;font-size:13px;" data-i18n="exportBtn">📥 Exportar progresso</button>
+          <button class="btn blue" id="tmImportBtn" style="height:42px;font-size:13px;" data-i18n="importBtn">📤 Importar progresso</button>
           <input type="file" id="tmImportFile" accept=".json" style="display:none;">
-          <button class="btn" id="tmResetBtn" style="height:42px;font-size:13px;background:#DC2626;box-shadow:0 4px 0 #991B1B;">
+          <button class="btn" id="tmResetBtn" style="height:42px;font-size:13px;background:#DC2626;box-shadow:0 4px 0 #991B1B;" data-i18n="resetBtn">
             🗑️ Resetar Pokédex
           </button>
           <div class="confirm-text" id="tmResetConfirm">
-            <strong>Tem certeza?</strong> Isso vai apagar TODA a Pokédex e estatísticas.
+            <span id="tmResetConfirmText" data-i18n-html="resetConfirmHTML"><strong>Tem certeza?</strong> Isso vai apagar TODA a Pokédex e estatísticas.</span>
             <div style="display:flex;gap:8px;margin-top:10px;">
-              <button class="btn gray" id="tmResetCancel" style="flex:1;height:34px;font-size:12px;">Cancelar</button>
-              <button class="btn" id="tmResetYes" style="flex:1;height:34px;font-size:12px;background:#DC2626;box-shadow:0 4px 0 #991B1B;">Sim, apagar tudo</button>
+              <button class="btn gray" id="tmResetCancel" style="flex:1;height:34px;font-size:12px;" data-i18n="cancelBtn">Cancelar</button>
+              <button class="btn" id="tmResetYes" style="flex:1;height:34px;font-size:12px;background:#DC2626;box-shadow:0 4px 0 #991B1B;" data-i18n="resetYes">Sim, apagar tudo</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <button class="btn gray" id="teacherClose" style="width:100%;margin-top:14px;">Fechar</button>
+    <button class="btn gray" id="teacherClose" style="width:100%;margin-top:14px;" data-i18n="closeBtn">Fechar</button>
   </div>
 </div>
 
@@ -304,7 +298,7 @@
 
 <!-- Mobile bottom nav (hidden on desktop via CSS) -->
 <div class="bottom-nav" id="bottomNav">
-  <button class="bottom-nav-btn" id="pokedexNavBtn">📕 Pokédex</button>
+  <button class="bottom-nav-btn" id="pokedexNavBtn">📕 <span data-i18n="pokedexLabel">Pokédex</span></button>
 </div>
 
 <script defer src="src/app.js"></script>

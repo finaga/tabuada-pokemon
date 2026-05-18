@@ -21,6 +21,7 @@ function defaultState() {
     totalQuestions: 0,
     totalCorrect:   0,
     totalTimeMs:    0,
+    lang:          'pt',
   };
 }
 
@@ -55,13 +56,7 @@ function loadState() {
 }
 
 const state = loadState();
-
-// Clear cached descriptions if they were stored in English
-if (state.descLang !== 'pt-br') {
-  state.pokemonCache = {};
-  state.descLang = 'pt-br';
-  save();
-}
+if (!state.lang) state.lang = 'pt';
 
 function save() {
   try { localStorage.setItem(V4_KEY, JSON.stringify(state)); } catch(_) { /* */ }
@@ -175,13 +170,537 @@ const TYPE_COLORS = {
   rock:'--type-rock', ghost:'--type-ghost', dragon:'--type-dragon',
   fairy:'--type-fairy', steel:'--type-steel', dark:'--type-dark',
 };
-const TYPE_NAMES_PT = {
-  normal:'Normal', fire:'Fogo', water:'Água', electric:'Elétrico',
-  grass:'Planta', ice:'Gelo', fighting:'Lutador', poison:'Veneno',
-  ground:'Terra', flying:'Voador', psychic:'Psíquico', bug:'Inseto',
-  rock:'Pedra', ghost:'Fantasma', dragon:'Dragão', fairy:'Fada',
-  steel:'Aço', dark:'Sombrio',
+// ── I18N ──────────────────────────────────────────────────────
+
+var I18N = {
+  pt: {
+    appTitle: 'Tabuada Pokémon',
+    startTitle: 'Tabuada Pokémon!',
+    chooseMode: 'Escolha seu modo de jogo, Sofia!',
+    modeAdventureTitle: 'Aventura',
+    modeAdventureDesc: 'Modo infinito · 5 erros = Game Over',
+    modeHardTitle: 'Gym Leader',
+    modeHardDesc: 'Cronômetro 10s · Mais divisões · +Shiny!',
+    adventureRulesHTML: '<strong>Modo Aventura:</strong><ul>' +
+      '<li>Contas infinitas de multiplicação e divisão</li>' +
+      '<li>Acertou? <strong>Capturou o Pokémon!</strong></li>' +
+      '<li>10 seguidas = próximo Pokémon é <strong>✨ SHINY!</strong></li>' +
+      '<li>Errou <strong>5 vezes</strong>? Game Over!</li></ul>',
+    hardRulesHTML: '<strong>Modo Gym Leader:</strong><ul>' +
+      '<li>Cronômetro de <strong>10 segundos</strong> por conta</li>' +
+      '<li>60% das contas são <strong>divisões</strong></li>' +
+      '<li>Maior chance de <strong>✨ Shiny!</strong></li>' +
+      '<li>Errou <strong>5 vezes</strong>? Game Over!</li></ul>',
+    startAdvBtn: 'Começar Aventura!',
+    startHardBtn: 'Desafiar o Gym Leader!',
+    catchBtn: 'Capturar!',
+    pokedexLabel: 'Pokédex',
+    medalsTitle: '🏅 Medalhas',
+    bestCombo: '🔥 Melhor combo',
+    bestCaught: '⚡ Melhor captura',
+    teacherBtn: '👨‍🏫 Modo Professor',
+    caughtPrefix: '✅ Você capturou ',
+    shinySuffix: ' ✨ SHINY ✨',
+    timeoutMsg: '⏱️ Tempo esgotado! A resposta era <strong>{a}</strong>. O Pokémon fugiu!',
+    wrongMsg: '❌ Errado! A resposta era <strong>{a}</strong>. O Pokémon fugiu!',
+    comboMilestone: '✨ COMBO x{n}! Próximo Pokémon é SHINY!',
+    comboMid: '🔥 Combo x{n}!',
+    newBadge: 'Nova medalha:',
+    pokedexComplete: '🌟 POKÉDEX COMPLETA! Você é lendária, Sofia! 🌟',
+    faintedTitle: 'Seus Pokémons desmaiaram! 😵',
+    faintedSub: 'Volte ao Centro Pokémon e tente de novo!',
+    statCaught: 'Capturados',
+    statStreak: 'Maior Combo',
+    statTotal: 'Contas',
+    statTime: 'Tempo Médio',
+    errorsPerTable: 'Erros por tabuada',
+    retryBtn: 'Tentar de Novo',
+    backHomeBtn: 'Voltar ao Menu',
+    leaveSessionConfirm: 'Voltar ao menu? Sua sessão vai ser perdida.',
+    loading: 'Carregando...',
+    noDesc: 'Sem descrição disponível.',
+    noConn: 'Sem conexão. Informações não carregadas.',
+    height: 'Altura',
+    weight: 'Peso',
+    cryBtn: '🔊 Ouvir grito',
+    teacherPwTitle: '👨‍🏫 Modo Professor',
+    teacherPwSub: 'Digite a senha para acessar.',
+    pwPlaceholder: 'Senha',
+    cancelBtn: 'Cancelar',
+    enterBtn: 'Entrar',
+    panelTitle: '📊 Painel do Professor',
+    tabStats: 'Estatísticas',
+    tabData: 'Dados',
+    overall: 'Resumo Geral',
+    sessions: 'Sessões',
+    totalAnswers: 'Total respostas',
+    accuracy: 'Taxa de acerto',
+    avgTime: 'Tempo médio',
+    errorsHist: 'Erros por Tabuada (histórico)',
+    last5: 'Últimas 5 Sessões',
+    manageData: 'Gerenciar dados',
+    exportBtn: '📥 Exportar progresso',
+    importBtn: '📤 Importar progresso',
+    resetBtn: '🗑️ Resetar Pokédex',
+    resetConfirmHTML: '<strong>Tem certeza?</strong> Isso vai apagar TODA a Pokédex e estatísticas.',
+    resetYes: 'Sim, apagar tudo',
+    closeBtn: 'Fechar',
+    exportSuccess: '✅ Progresso exportado!',
+    importSuccess: '✅ Progresso importado!',
+    importInvalid: '❌ Arquivo inválido.',
+    importError: '❌ Erro ao ler arquivo.',
+    resetSuccess: '🗑️ Tudo resetado.',
+    sessionDate: 'Sessão',
+    sessionMode: 'Modo',
+    noDataYet: 'Sem dados ainda.',
+    noSessions: 'Sem sessões registradas.',
+    types: {
+      normal:'Normal', fire:'Fogo', water:'Água', electric:'Elétrico',
+      grass:'Planta', ice:'Gelo', fighting:'Lutador', poison:'Veneno',
+      ground:'Terra', flying:'Voador', psychic:'Psíquico', bug:'Inseto',
+      rock:'Pedra', ghost:'Fantasma', dragon:'Dragão', fairy:'Fada',
+      steel:'Aço', dark:'Sombrio',
+    },
+    badges: {
+      first:     ['Primeiro Pokémon', '1º Pokémon capturado'],
+      ten:       ['Treinadora Iniciante', '10 Pokémons capturados'],
+      thirty:    ['Boa Treinadora', '30 Pokémons capturados'],
+      fifty:     ['Professora Oak Jr.', '50 Pokémons capturados'],
+      hundred:   ['Veterana', '100 Pokémons capturados'],
+      allcaught: ['Pokédex Completa', 'Todos os 151 capturados!'],
+      shiny1:    ['Primeiro Shiny', '1º Pokémon Shiny capturado'],
+      streak20:  ['Combo Master', 'Combo de 20+ em uma sessão'],
+      gymleader: ['Gym Leader', 'Jogou no modo Gym Leader'],
+    },
+  },
+  en: {
+    appTitle: 'Pokémon Times Tables',
+    startTitle: 'Pokémon Times Tables!',
+    chooseMode: 'Choose your game mode, Sofia!',
+    modeAdventureTitle: 'Adventure',
+    modeAdventureDesc: 'Endless mode · 5 mistakes = Game Over',
+    modeHardTitle: 'Gym Leader',
+    modeHardDesc: '10s timer · More divisions · +Shiny!',
+    adventureRulesHTML: '<strong>Adventure Mode:</strong><ul>' +
+      '<li>Endless multiplication & division problems</li>' +
+      '<li>Got it right? <strong>You caught the Pokémon!</strong></li>' +
+      '<li>10 in a row = next Pokémon is <strong>✨ SHINY!</strong></li>' +
+      '<li>Get it wrong <strong>5 times</strong>? Game Over!</li></ul>',
+    hardRulesHTML: '<strong>Gym Leader Mode:</strong><ul>' +
+      '<li><strong>10-second</strong> timer per problem</li>' +
+      '<li>60% of problems are <strong>divisions</strong></li>' +
+      '<li>Higher chance of <strong>✨ Shiny!</strong></li>' +
+      '<li>Get it wrong <strong>5 times</strong>? Game Over!</li></ul>',
+    startAdvBtn: 'Start Adventure!',
+    startHardBtn: 'Challenge the Gym Leader!',
+    catchBtn: 'Catch!',
+    pokedexLabel: 'Pokédex',
+    medalsTitle: '🏅 Badges',
+    bestCombo: '🔥 Best combo',
+    bestCaught: '⚡ Best catch',
+    teacherBtn: '👨‍🏫 Teacher Mode',
+    caughtPrefix: '✅ You caught ',
+    shinySuffix: ' ✨ SHINY ✨',
+    timeoutMsg: "⏱️ Time's up! The answer was <strong>{a}</strong>. The Pokémon escaped!",
+    wrongMsg: '❌ Wrong! The answer was <strong>{a}</strong>. The Pokémon escaped!',
+    comboMilestone: '✨ COMBO x{n}! Next Pokémon is SHINY!',
+    comboMid: '🔥 Combo x{n}!',
+    newBadge: 'New badge:',
+    pokedexComplete: '🌟 POKÉDEX COMPLETE! You are legendary, Sofia! 🌟',
+    faintedTitle: 'Your Pokémon fainted! 😵',
+    faintedSub: 'Return to the Pokémon Center and try again!',
+    statCaught: 'Caught',
+    statStreak: 'Best Combo',
+    statTotal: 'Problems',
+    statTime: 'Avg Time',
+    errorsPerTable: 'Errors per table',
+    retryBtn: 'Try Again',
+    backHomeBtn: 'Back to Menu',
+    leaveSessionConfirm: 'Back to menu? Your session will be lost.',
+    loading: 'Loading...',
+    noDesc: 'No description available.',
+    noConn: "No connection. Info couldn't load.",
+    height: 'Height',
+    weight: 'Weight',
+    cryBtn: '🔊 Hear cry',
+    teacherPwTitle: '👨‍🏫 Teacher Mode',
+    teacherPwSub: 'Enter password to access.',
+    pwPlaceholder: 'Password',
+    cancelBtn: 'Cancel',
+    enterBtn: 'Enter',
+    panelTitle: '📊 Teacher Panel',
+    tabStats: 'Statistics',
+    tabData: 'Data',
+    overall: 'Overall Summary',
+    sessions: 'Sessions',
+    totalAnswers: 'Total answers',
+    accuracy: 'Accuracy',
+    avgTime: 'Avg time',
+    errorsHist: 'Errors per Table (history)',
+    last5: 'Last 5 Sessions',
+    manageData: 'Manage data',
+    exportBtn: '📥 Export progress',
+    importBtn: '📤 Import progress',
+    resetBtn: '🗑️ Reset Pokédex',
+    resetConfirmHTML: '<strong>Are you sure?</strong> This will erase ALL Pokédex and statistics.',
+    resetYes: 'Yes, erase everything',
+    closeBtn: 'Close',
+    exportSuccess: '✅ Progress exported!',
+    importSuccess: '✅ Progress imported!',
+    importInvalid: '❌ Invalid file.',
+    importError: '❌ Error reading file.',
+    resetSuccess: '🗑️ Everything reset.',
+    sessionDate: 'Session',
+    sessionMode: 'Mode',
+    noDataYet: 'No data yet.',
+    noSessions: 'No sessions recorded.',
+    types: {
+      normal:'Normal', fire:'Fire', water:'Water', electric:'Electric',
+      grass:'Grass', ice:'Ice', fighting:'Fighting', poison:'Poison',
+      ground:'Ground', flying:'Flying', psychic:'Psychic', bug:'Bug',
+      rock:'Rock', ghost:'Ghost', dragon:'Dragon', fairy:'Fairy',
+      steel:'Steel', dark:'Dark',
+    },
+    badges: {
+      first:     ['First Pokémon', '1st Pokémon caught'],
+      ten:       ['Rookie Trainer', '10 Pokémon caught'],
+      thirty:    ['Good Trainer', '30 Pokémon caught'],
+      fifty:     ['Professor Oak Jr.', '50 Pokémon caught'],
+      hundred:   ['Veteran', '100 Pokémon caught'],
+      allcaught: ['Complete Pokédex', 'All 151 caught!'],
+      shiny1:    ['First Shiny', '1st Shiny caught'],
+      streak20:  ['Combo Master', 'Combo of 20+ in one session'],
+      gymleader: ['Gym Leader', 'Played Gym Leader Mode'],
+    },
+  },
 };
+
+// All 151 Gen 1 Pokémon descriptions
+var DESC = {
+  pt: [
+    'Tem uma planta nas costas que cresce com a luz do sol.',
+    'A planta nas costas começa a florescer. Pesa mais do que parece.',
+    'A enorme flor libera um perfume calmante.',
+    'A chama na cauda mostra como ele está se sentindo.',
+    'Quando bravo, sua chama queima ainda mais forte.',
+    'Cospe fogo intenso e voa pelos céus em busca de oponentes fortes.',
+    'Esconde-se no casco quando se sente em perigo.',
+    'A cauda peluda é símbolo de sua longa vida.',
+    'Possui canhões de água potentes em seu casco.',
+    'Solta um cheiro forte das antenas para afastar inimigos.',
+    'Está se preparando para evoluir. Não pode se mover muito.',
+    'Coleta pólen de flores com suas pequenas pernas.',
+    'Tem um ferrão venenoso na cabeça. Adora folhas.',
+    'Quase imóvel, mas pode endurecer ainda mais se atacado.',
+    'Voa em alta velocidade e ataca com seus três ferrões.',
+    'Pássaro comum em florestas e gramados. Muito dócil.',
+    'Caça pequenos Pokémon em seu vasto território.',
+    'Voa a velocidades incríveis em busca de presas.',
+    'Morde tudo que vê. Os dentes não param de crescer.',
+    'Seus dentes afiados podem cortar madeira dura.',
+    'Pequeno mas barulhento. Avisa o bando sobre perigos.',
+    'Voa por dias sem cansar, à procura de presas.',
+    'Cobra de movimentos silenciosos. Engole presas inteiras.',
+    'Os padrões em seu corpo intimidam os inimigos.',
+    'Acumula eletricidade nas bochechas. Solta choques quando assustado.',
+    'A cauda libera eletricidade no chão para se aterrar.',
+    'Cava no chão seco e se enrola para se defender.',
+    'Suas garras afiadas escavam túneis profundos.',
+    'Possui um chifre pequeno com veneno suave.',
+    'Protege seus filhotes com ferocidade.',
+    'Rainha resistente. Esmaga inimigos com seu corpo.',
+    'Mais agressivo que sua versão fêmea. Chifre maior.',
+    'Chifre poderoso e venenoso. Não recua de uma briga.',
+    'Rei poderoso. Sua cauda derruba torres.',
+    'Pequeno e raro. Diz-se que dança ao luar.',
+    'Esconde-se nas montanhas. Audição apurada.',
+    'Nasce com uma cauda que se divide ao crescer.',
+    'Tem nove caudas mágicas e vida muito longa.',
+    'Canta canções de ninar que põem qualquer um para dormir.',
+    'Corpo macio e elástico. Olhos grandes e expressivos.',
+    'Vive em cavernas escuras. Usa ondas sonoras para se guiar.',
+    'Suga sangue de suas vítimas com presas afiadas.',
+    'Caminha à noite para espalhar suas sementes.',
+    'Solta um odor terrível para afastar predadores.',
+    'A flor enorme libera pólen tóxico.',
+    'Cogumelos parasitas crescem em suas costas.',
+    'O cogumelo agora controla o inseto hospedeiro.',
+    'Olhos compostos enxergam até no escuro.',
+    'As escamas das asas paralisam quem as toca.',
+    'Só sua cabecinha aparece na terra. Cava sem parar.',
+    'Três Digletts trabalhando juntos. Cava profundo e rápido.',
+    'Adora coisas brilhantes e moedas. Anda sozinho.',
+    'Elegante e orgulhoso. Tem uma joia na testa.',
+    'Sempre com dor de cabeça. Libera poderes psíquicos sem perceber.',
+    'Nadador veloz. Garras palmadas e mente afiada.',
+    'Pequeno macaco furioso. Bate em qualquer coisa quando irritado.',
+    'Vive em fúria constante. Persegue qualquer um por horas.',
+    'Cãozinho leal e corajoso. Late forte quando estranhos aparecem.',
+    'Cão lendário das chamas. Corre a velocidades incríveis.',
+    'Espirais em sua barriga giram quando ele se move.',
+    'Adora água. Fica fraco se a pele secar.',
+    'Nadador profissional. Punhos fortes como aço.',
+    'Dorme 18 horas por dia. Teleporta quando assustado.',
+    'A colher amplifica seus poderes mentais.',
+    'Inteligência incrível. Lembra de tudo desde o nascimento.',
+    'Filhote musculoso. Treina diariamente para ficar mais forte.',
+    'Corpo de aço. Pode levantar 10 toneladas com facilidade.',
+    'Tem quatro braços e desfere mil golpes por segundo.',
+    'Corpo fino e flexível. Suas raízes se movem como pés.',
+    'Pendura-se em galhos esperando presas.',
+    'Planta carnívora gigante. Engole presas inteiras.',
+    'Quase invisível na água. Tentáculos venenosos.',
+    'Possui 80 tentáculos cheios de toxinas.',
+    'Pedra com braços. Confundido com rochas comuns.',
+    'Rola montanha abaixo. Quebra árvores no caminho.',
+    'Casco duro como diamante. Troca de casca ao crescer.',
+    'Cavalo com crina de fogo. Recém-nascido já corre.',
+    'Corre a 240 km/h com sua cauda em chamas.',
+    'Sempre pensando em algo. Dócil e devagar.',
+    'Um Shellder mordeu sua cauda, dando-lhe poderes psíquicos.',
+    'Flutua usando magnetismo. Adora eletricidade.',
+    'Três Magnemites unidos. Emite campos magnéticos fortes.',
+    'Carrega um talo de planta como espada. Muito territorial.',
+    'Pássaro de duas cabeças. Quase nunca dorme.',
+    'Três cabeças expressam três humores diferentes.',
+    'Adora águas geladas. Pode quebrar gelo com sua cabeça.',
+    'Nada graciosamente em águas frias. Pelo branco brilhante.',
+    'Massa de lodo nasceu da poluição. Cheira muito mal.',
+    'Lodo tóxico. Mata plantas com seu cheiro.',
+    'Concha dura como diamante. Língua sempre para fora.',
+    'Casca quase indestrutível. Dispara espinhos.',
+    'Quase totalmente feito de gás. Encolhe ao vento.',
+    'Adora pregar peças. Sua língua pode causar paralisia.',
+    'Esconde-se nas sombras. Rouba calor dos vivos.',
+    'Cobra gigante de pedras. Cava túneis a alta velocidade.',
+    'Hipnotiza para comer sonhos de pessoas dormindo.',
+    'Balança o pêndulo para hipnotizar suas presas.',
+    'Caranguejo pequeno. Pinças regeneram quando perdidas.',
+    'Tem uma pinça gigantesca capaz de dobrar aço.',
+    'Parece uma Pokébola. Explode com facilidade.',
+    'Pokébola viva. A descarga é tremenda.',
+    'Aglomerado de seis ovos que se comunicam por telepatia.',
+    'Cabeças se desenvolvem em árvore. Cada uma pensa diferente.',
+    'Usa o crânio de sua mãe sobre a cabeça. Vive solitário.',
+    'Lutador feroz com um osso como arma.',
+    'Pernas elásticas para chutes poderosos.',
+    'Punhos rápidos como pistões. Treina sem parar.',
+    'Língua duas vezes maior que seu corpo. Lambe tudo.',
+    'Cheio de gás venenoso. Flutua no ar.',
+    'Dois corpos gasosos. Gases combinados são mais tóxicos.',
+    'Cabeça dura. Corre em linha reta até bater em algo.',
+    'Couraça resiste até a lava. Caminha sobre duas patas.',
+    'Sempre carrega um ovo nutritivo. Muito gentil.',
+    'Coberto de cipós azuis que se renovam constantemente.',
+    'Leva seu filhote na bolsa. Muito protetora.',
+    'Cavalo-marinho pequeno. Cospe tinta quando assustado.',
+    'Espinhos venenosos nas barbatanas. Nadador agressivo.',
+    'Peixe gracioso com chifre pontudo. Nada bem na corrente.',
+    'Cria ninhos no fundo dos rios. Macho protege os ovos.',
+    'Estrela do mar. Núcleo brilha como uma joia.',
+    'Núcleo em forma de joia emite raios coloridos.',
+    'Cria paredes invisíveis com gestos das mãos.',
+    'Foices afiadas como navalhas. Caçador veloz.',
+    'Dança hipnótica. Fala em uma língua misteriosa.',
+    'Atrai eletricidade. Aparece em tempestades.',
+    'Vive em vulcões ativos. Corpo quente como brasas.',
+    'Pinças no topo da cabeça esmagam inimigos.',
+    'Touro furioso. Três caudas chicoteiam sem parar.',
+    'Apenas pula. Quase nenhum poder de luta.',
+    'Furioso e destrutivo. Causa tempestades quando aparece.',
+    'Gentil gigante do mar. Carrega pessoas nas costas.',
+    'Transforma-se em qualquer Pokémon que ver.',
+    'Genética instável. Pode evoluir de muitas formas.',
+    'Corpo se mistura com a água, ficando invisível.',
+    'Pelos eriçados disparam pequenos raios elétricos.',
+    'Bolsa de fogo dentro do corpo. Temperatura altíssima.',
+    'Pokémon feito de código. Vive em computadores.',
+    'Fóssil pré-histórico. Concha em espiral.',
+    'Boca cheia de dentes para esmagar conchas.',
+    'Fóssil ancestral. Olhos extras nas costas.',
+    'Caçador veloz dos mares antigos. Foices afiadas.',
+    'Pterodáctilo pré-histórico. Voa em altíssima velocidade.',
+    'Dorme e come o dia todo. Pesa mais que um caminhão.',
+    'Lendário pássaro de gelo. Aparece em montanhas nevadas.',
+    'Lendário pássaro elétrico. Aparece em tempestades.',
+    'Lendário pássaro de fogo. Asas envoltas em chamas.',
+    'Dragão pequeno. Cresce constantemente trocando de pele.',
+    'Corpo elegante e místico. Controla o clima.',
+    'Dragão amável. Voa pelos oceanos salvando navegantes.',
+    'Criado em laboratório. O Pokémon mais poderoso já visto.',
+    'Lendário. Contém o DNA de todos os Pokémon.',
+  ],
+  en: [
+    'Has a plant on its back that grows with sunlight.',
+    'The bud on its back is starting to bloom. Heavier than it looks.',
+    'The huge flower releases a calming scent.',
+    "The flame on its tail shows how it's feeling.",
+    'When angry, its flame burns hotter.',
+    'Breathes intense fire. Flies the skies seeking strong foes.',
+    'Hides in its shell when it senses danger.',
+    'Its fluffy tail is a sign of long life.',
+    'Powerful water cannons sit atop its shell.',
+    'Releases a strong smell from its antennae to ward off enemies.',
+    'Preparing to evolve. Can barely move.',
+    'Gathers pollen from flowers with tiny legs.',
+    'Has a venomous stinger on its head. Loves leaves.',
+    'Mostly motionless, but can harden further if attacked.',
+    'Flies at high speeds and attacks with three stingers.',
+    'Common bird in forests and meadows. Very docile.',
+    'Hunts small Pokémon in its vast territory.',
+    'Flies at incredible speeds searching for prey.',
+    'Bites everything in sight. Teeth never stop growing.',
+    'Sharp teeth can cut through hard wood.',
+    'Small but noisy. Warns the flock about danger.',
+    'Flies for days without tiring, hunting for prey.',
+    'Silent-moving snake. Swallows prey whole.',
+    'Patterns on its body intimidate enemies.',
+    'Stores electricity in its cheeks. Shocks when startled.',
+    'Its tail discharges electricity into the ground.',
+    'Burrows in dry ground and curls up to defend itself.',
+    'Sharp claws dig deep tunnels.',
+    'Has a small horn with mild venom.',
+    'Fiercely protects its young.',
+    'Tough queen. Crushes foes with her body.',
+    'More aggressive than the female. Larger horn.',
+    'Powerful, venomous horn. Never backs down from a fight.',
+    'Powerful king. Its tail can topple towers.',
+    'Small and rare. Said to dance in moonlight.',
+    'Hides in the mountains. Has sharp hearing.',
+    'Born with a tail that splits as it grows.',
+    'Has nine mystical tails and a very long life.',
+    'Sings lullabies that put anyone to sleep.',
+    'Soft, elastic body. Big expressive eyes.',
+    'Lives in dark caves. Navigates by sound waves.',
+    'Drains blood from its victims with sharp fangs.',
+    'Walks at night to scatter its seeds.',
+    'Releases a terrible odor to drive off predators.',
+    'Its huge flower releases toxic pollen.',
+    'Parasitic mushrooms grow on its back.',
+    'The mushroom now controls the host bug.',
+    'Compound eyes can see even in the dark.',
+    'Scales on its wings paralyze whoever touches them.',
+    'Only its little head pokes out. Digs nonstop.',
+    'Three Digletts working together. Digs deep and fast.',
+    'Loves shiny things and coins. Walks alone.',
+    'Elegant and proud. Has a jewel on its forehead.',
+    'Always has a headache. Releases psychic power unknowingly.',
+    'Fast swimmer. Webbed claws and a sharp mind.',
+    'Small furious monkey. Hits anything when angry.',
+    'Always enraged. Chases foes for hours.',
+    'Loyal and brave pup. Barks loudly at strangers.',
+    'Legendary fire dog. Runs at incredible speeds.',
+    'Spirals on its belly spin when it moves.',
+    'Loves water. Weakens if its skin dries out.',
+    'Pro swimmer. Fists as hard as steel.',
+    'Sleeps 18 hours a day. Teleports when scared.',
+    'The spoon amplifies its mental power.',
+    'Incredible intelligence. Remembers everything since birth.',
+    'Muscular cub. Trains daily to grow stronger.',
+    'Body of steel. Can lift 10 tons easily.',
+    'Has four arms and throws a thousand punches per second.',
+    'Thin, flexible body. Its roots move like feet.',
+    'Hangs from branches waiting for prey.',
+    'Giant carnivorous plant. Swallows prey whole.',
+    'Almost invisible in water. Venomous tentacles.',
+    'Has 80 tentacles full of toxins.',
+    'A rock with arms. Often mistaken for ordinary stones.',
+    'Rolls down mountainsides. Smashes trees in its path.',
+    'Shell as hard as diamond. Sheds it as it grows.',
+    'Horse with a fiery mane. Newborns can already run.',
+    'Gallops at 150 mph with a flaming tail.',
+    'Always thinking about something. Gentle and slow.',
+    'A Shellder bit its tail, giving it psychic powers.',
+    'Floats using magnetism. Loves electricity.',
+    'Three united Magnemites. Emits strong magnetic fields.',
+    'Carries a plant stalk as a sword. Very territorial.',
+    'Two-headed bird. Hardly ever sleeps.',
+    'Three heads express three different moods.',
+    'Loves icy waters. Can crack ice with its head.',
+    'Swims gracefully in cold waters. Brilliant white fur.',
+    'Sludge creature born from pollution. Smells awful.',
+    'Toxic sludge. Kills plants with its stench.',
+    'Shell as hard as diamond. Tongue always sticking out.',
+    'Almost indestructible shell. Fires spikes.',
+    'Almost entirely gas. Shrinks in the wind.',
+    'Loves pranks. Its lick can paralyze.',
+    'Hides in shadows. Steals heat from the living.',
+    'Giant snake of rocks. Tunnels at high speeds.',
+    'Hypnotizes prey to eat the dreams of sleepers.',
+    'Swings its pendulum to hypnotize prey.',
+    'Small crab. Pincers regrow when lost.',
+    'Has a giant pincer that can bend steel.',
+    'Looks like a Poké Ball. Explodes easily.',
+    'A living Poké Ball. Its discharge is huge.',
+    'Cluster of six eggs that talk by telepathy.',
+    'Heads grow into a tree. Each thinks differently.',
+    "Wears its mother's skull on its head. Lives alone.",
+    'Fierce fighter wielding a bone as a weapon.',
+    'Elastic legs for powerful kicks.',
+    'Fists fast as pistons. Trains nonstop.',
+    'Tongue twice as long as its body. Licks everything.',
+    'Full of poisonous gas. Floats in the air.',
+    'Two gas bodies. Combined gas is more toxic.',
+    'Tough head. Runs in a straight line until it hits something.',
+    'Armor resists even lava. Walks on two legs.',
+    'Always carries a nutritious egg. Very kind.',
+    'Covered in blue vines that constantly renew.',
+    'Carries its baby in its pouch. Very protective.',
+    'Small seahorse. Spits ink when startled.',
+    'Venomous spines on its fins. Aggressive swimmer.',
+    'Graceful fish with a pointed horn. Swims well in currents.',
+    'Makes nests at the bottom of rivers. Males guard the eggs.',
+    'Sea star. Core shines like a jewel.',
+    'Jewel-shaped core emits colorful rays.',
+    'Creates invisible walls with hand gestures.',
+    'Razor-sharp scythes. Swift hunter.',
+    'Hypnotic dance. Speaks a mysterious language.',
+    'Draws electricity. Appears in thunderstorms.',
+    'Lives in active volcanoes. Body hot as embers.',
+    'Pincers on its head crush enemies.',
+    'Furious bull. Three tails whip without stop.',
+    'Just flops around. Almost no fighting power.',
+    'Furious and destructive. Causes storms when it appears.',
+    'Gentle giant of the sea. Carries people on its back.',
+    'Transforms into any Pokémon it sees.',
+    'Unstable genetics. Can evolve in many ways.',
+    'Body blends into water, becoming invisible.',
+    'Bristly fur shoots tiny lightning bolts.',
+    'Holds fire inside its body. Extremely hot.',
+    'Pokémon made of code. Lives in computers.',
+    'Prehistoric fossil. Spiral shell.',
+    'Mouth full of teeth for crushing shells.',
+    'Ancient fossil. Extra eyes on its back.',
+    'Swift hunter of ancient seas. Sharp scythes.',
+    'Prehistoric pterodactyl. Flies at top speed.',
+    'Sleeps and eats all day. Heavier than a truck.',
+    'Legendary ice bird. Appears on snowy mountains.',
+    'Legendary electric bird. Appears in storms.',
+    'Legendary fire bird. Wings wrapped in flames.',
+    'Small dragon. Constantly grows by shedding skin.',
+    'Elegant and mystical body. Controls the weather.',
+    'Kind dragon. Flies oceans saving sailors.',
+    'Created in a lab. The most powerful Pokémon ever seen.',
+    'Legendary. Contains the DNA of every Pokémon.',
+  ],
+};
+
+function t(key) {
+  var dict = I18N[state.lang || 'pt'] || I18N.pt;
+  var path = key.split('.');
+  var val = dict, fallback = I18N.pt;
+  for (var i = 0; i < path.length && val != null; i++) val = val[path[i]];
+  if (val == null) {
+    val = fallback;
+    for (var j = 0; j < path.length && val != null; j++) val = val[path[j]];
+  }
+  return val == null ? key : val;
+}
+
+function getDesc(id) {
+  var arr = DESC[state.lang || 'pt'] || DESC.pt;
+  return arr[id - 1] || '';
+}
 
 function pad3(n) { return String(n).padStart(3, '0'); }
 function getPokemonName(id) { return POKEDEX[id - 1] || ('Pokémon #' + pad3(id)); }
@@ -193,40 +712,29 @@ function spriteUrl(id, shiny) {
 function renderTypeBadges(container, types) {
   container.innerHTML = '';
   if (!types || !types.length) return;
-  types.forEach(function(t) {
+  types.forEach(function(tp) {
     var badge = document.createElement('span');
     badge.className = 'type-badge';
-    badge.style.background = 'var(' + (TYPE_COLORS[t] || '--type-normal') + ')';
-    badge.textContent = TYPE_NAMES_PT[t] || t;
+    badge.style.background = 'var(' + (TYPE_COLORS[tp] || '--type-normal') + ')';
+    badge.textContent = t('types.' + tp) || tp;
     container.appendChild(badge);
   });
 }
 
 function fetchPokemonData(id) {
   if (state.pokemonCache[id]) return Promise.resolve(state.pokemonCache[id]);
-  return Promise.all([
-    fetch('https://pokeapi.co/api/v2/pokemon/' + id),
-    fetch('https://pokeapi.co/api/v2/pokemon-species/' + id),
-  ]).then(function(responses) {
-    if (!responses[0].ok || !responses[1].ok) throw new Error();
-    return Promise.all([responses[0].json(), responses[1].json()]);
-  }).then(function(data) {
-    var poke    = data[0];
-    var species = data[1];
-    var entries = species.flavor_text_entries || [];
-    var entry   = entries.find(function(e) { return e.language.name === 'pt-br'; })
-                || entries.find(function(e) { return e.language.name === 'en'; });
-    var desc    = entry ? entry.flavor_text.replace(/[\f\n\r]/g, ' ').replace(/\s+/g, ' ').trim() : '';
-    var result  = {
-      types:       poke.types.map(function(t) { return t.type.name; }),
-      heightM:     poke.height / 10,
-      weightKg:    poke.weight / 10,
-      description: desc,
-    };
-    state.pokemonCache[id] = result;
-    save();
-    return result;
-  }).catch(function() { return null; });
+  return fetch('https://pokeapi.co/api/v2/pokemon/' + id)
+    .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+    .then(function(poke) {
+      var result = {
+        types:    poke.types.map(function(tp) { return tp.type.name; }),
+        heightM:  poke.height / 10,
+        weightKg: poke.weight / 10,
+      };
+      state.pokemonCache[id] = result;
+      save();
+      return result;
+    }).catch(function() { return null; });
 }
 
 function pickPokemonId(isShiny) {
@@ -247,16 +755,18 @@ function pickPokemonId(isShiny) {
 // ── Badges ────────────────────────────────────────────────────
 
 var BADGES = [
-  { id: 'first',     icon: '🌱', name: 'Primeiro Pokémon',     desc: '1º Pokémon capturado' },
-  { id: 'ten',       icon: '🎒', name: 'Treinadora Iniciante', desc: '10 Pokémons capturados' },
-  { id: 'thirty',    icon: '⭐', name: 'Boa Treinadora',        desc: '30 Pokémons capturados' },
-  { id: 'fifty',     icon: '🏆', name: 'Professora Oak Jr.',   desc: '50 Pokémons capturados' },
-  { id: 'hundred',   icon: '👑', name: 'Veterana',              desc: '100 Pokémons capturados' },
-  { id: 'allcaught', icon: '🌟', name: 'Pokédex Completa',     desc: 'Todos os 151 capturados!' },
-  { id: 'shiny1',    icon: '✨', name: 'Primeiro Shiny',        desc: '1º Pokémon Shiny capturado' },
-  { id: 'streak20',  icon: '🔥', name: 'Combo Master',          desc: 'Combo de 20+ em uma sessão' },
-  { id: 'gymleader', icon: '🏋️', name: 'Gym Leader',            desc: 'Jogou no modo Gym Leader' },
+  { id: 'first',     icon: '🌱' },
+  { id: 'ten',       icon: '🎒' },
+  { id: 'thirty',    icon: '⭐' },
+  { id: 'fifty',     icon: '🏆' },
+  { id: 'hundred',   icon: '👑' },
+  { id: 'allcaught', icon: '🌟' },
+  { id: 'shiny1',    icon: '✨' },
+  { id: 'streak20',  icon: '🔥' },
+  { id: 'gymleader', icon: '🏋️' },
 ];
+function badgeName(id) { var b = t('badges.' + id); return Array.isArray(b) ? b[0] : id; }
+function badgeDesc(id) { var b = t('badges.' + id); return Array.isArray(b) ? b[1] : ''; }
 
 function checkAndAwardBadges(sess) {
   var captured = Object.keys(state.pokedex).length;
@@ -288,12 +798,12 @@ function checkAndAwardBadges(sess) {
   if (newBadges.length) {
     save();
     newBadges.forEach(function(b, i) {
-      setTimeout(function() { showToast('🏅 Nova medalha: ' + b.name + '!', 2500); }, i * 900);
+      setTimeout(function() { showToast('🏅 ' + t('newBadge') + ' ' + badgeName(b.id) + '!', 2500); }, i * 900);
     });
   }
   if (captured >= 151 && !state._pokedexCelebrated) {
     state._pokedexCelebrated = true;
-    setTimeout(function() { showToast('🌟 POKÉDEX COMPLETA! Você é lendária, Sofia! 🌟', 4000, 'shiny-toast'); }, 1400);
+    setTimeout(function() { showToast(t('pokedexComplete'), 4000, 'shiny-toast'); }, 1400);
   }
 }
 
@@ -314,7 +824,7 @@ function renderLives(remaining) {
   var c = $('hudLives');
   if (!c) return;
   c.innerHTML = '';
-  for (var i = 0; i < 10; i++) {
+  for (var i = 0; i < MAX_ERRORS; i++) {
     var s = document.createElement('span');
     s.textContent = i < remaining ? '❤️' : '🖤';
     c.appendChild(s);
@@ -356,9 +866,9 @@ function renderResultChart(containerId, errorMap, totalMap) {
   var container = $(containerId);
   container.innerHTML = '';
   var hasData = false;
-  for (var t = 1; t <= 9; t++) {
-    var errors = errorMap[t] || 0;
-    var total  = totalMap[t] || 0;
+  for (var tbl = 1; tbl <= 9; tbl++) {
+    var errors = errorMap[tbl] || 0;
+    var total  = totalMap[tbl] || 0;
     if (!total) continue;
     hasData = true;
     var pct = (errors / total) * 100;
@@ -366,7 +876,7 @@ function renderResultChart(containerId, errorMap, totalMap) {
     row.className = 'result-chart-row';
     var label = document.createElement('div');
     label.className = 'result-chart-label';
-    label.textContent = '× ' + t;
+    label.textContent = '× ' + tbl;
     var bar  = document.createElement('div');
     bar.className = 'result-chart-bar';
     var fill = document.createElement('div');
@@ -459,7 +969,7 @@ function renderBadges() {
     el.textContent = b.icon;
     var tip = document.createElement('div');
     tip.className = 'badge-tooltip';
-    tip.textContent = b.name;
+    tip.textContent = badgeName(b.id);
     el.appendChild(tip);
     grid.appendChild(el);
   });
@@ -490,7 +1000,7 @@ function openPokemonModal(id) {
   $('pdNum').textContent    = '#' + pad3(id);
   $('pdName').textContent   = getPokemonName(id);
   $('pdSprite').src         = spriteUrl(id, isShiny);
-  $('pdDesc').innerHTML     = '<span class="loading-spinner"></span> Carregando...';
+  $('pdDesc').innerHTML     = '<span class="loading-spinner"></span> ' + t('loading');
   $('pdHeight').textContent = '—';
   $('pdWeight').textContent = '—';
   $('pdTypes').innerHTML    = '';
@@ -503,15 +1013,17 @@ function openPokemonModal(id) {
 
   overlay.style.display = 'flex';
 
+  // Description is bundled — show immediately
+  $('pdDesc').textContent = getDesc(id) || t('noDesc');
+
   fetchPokemonData(id).then(function(data) {
     if (!data) {
-      $('pdDesc').textContent = 'Sem conexão. Informações não carregadas.';
+      if (!getDesc(id)) $('pdDesc').textContent = t('noConn');
       return;
     }
     renderTypeBadges($('pdTypes'), data.types);
     $('pdHeight').textContent = data.heightM.toFixed(1) + ' m';
     $('pdWeight').textContent = data.weightKg.toFixed(1) + ' kg';
-    $('pdDesc').textContent   = data.description || 'Sem descrição disponível.';
   });
 }
 
@@ -522,7 +1034,7 @@ function closePokemonModal() {
 
 // ── Game constants ────────────────────────────────────────────
 
-var MAX_ERRORS     = 10;
+var MAX_ERRORS     = 5;
 var HARD_TIMER     = 10;
 var SHINY_BASE     = 0.05;
 var SHINY_HARD     = 0.10;
@@ -555,9 +1067,9 @@ function shinyChance() {
 
 function weightedTable() {
   var pool = [];
-  for (var t = 1; t <= 9; t++) {
-    var w = 1 + Math.min(state.errorMap[t] || 0, 5);
-    for (var i = 0; i < w; i++) pool.push(t);
+  for (var tbl = 1; tbl <= 9; tbl++) {
+    var w = 1 + Math.min(state.errorMap[tbl] || 0, 5);
+    for (var i = 0; i < w; i++) pool.push(tbl);
   }
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -705,17 +1217,17 @@ function handleCorrect(q) {
     session.forcedShinyNext = true;
     soundMilestone();
     flashShinyMeter();
-    showToast('✨ COMBO x' + session.streak + '! Próximo Pokémon é SHINY!', 3000, 'shiny-toast');
+    showToast(t('comboMilestone').replace('{n}', session.streak), 3000, 'shiny-toast');
   } else if (session.streak > 0 && session.streak % 5 === 0) {
     soundCombo();
-    showToast('🔥 Combo x' + session.streak + '!', 1500);
+    showToast(t('comboMid').replace('{n}', session.streak), 1500);
   }
 
   playPokeballAnim();
 
   var fb = $('feedback');
   fb.className = 'feedback correct';
-  fb.innerHTML = '✅ Você capturou ' + getPokemonName(pid) + (isShiny ? ' ✨ SHINY ✨' : '') + '!';
+  fb.innerHTML = t('caughtPrefix') + getPokemonName(pid) + (isShiny ? t('shinySuffix') : '') + '!';
 
   renderPokedex(isNew ? pid : null);
   checkAndAwardBadges(session);
@@ -742,9 +1254,7 @@ function handleWrong(isTimeout) {
 
   var fb = $('feedback');
   fb.className = 'feedback wrong';
-  fb.innerHTML = isTimeout
-    ? '⏱️ Tempo esgotado! A resposta era <strong>' + q.answer + '</strong>. O Pokémon fugiu!'
-    : '❌ Errado! A resposta era <strong>' + q.answer + '</strong>. O Pokémon fugiu!';
+  fb.innerHTML = (isTimeout ? t('timeoutMsg') : t('wrongMsg')).replace('{a}', q.answer);
 
   save();
   setTimeout(function() {
@@ -798,11 +1308,11 @@ function endGame() {
   $('bestCaught').textContent = state.bestCaught  || 0;
 
   var totalsPerTable = {};
-  Object.keys(session.successTables).forEach(function(t) {
-    totalsPerTable[t] = session.successTables[t];
+  Object.keys(session.successTables).forEach(function(k) {
+    totalsPerTable[k] = session.successTables[k];
   });
-  Object.keys(session.errorTables).forEach(function(t) {
-    totalsPerTable[t] = (totalsPerTable[t] || 0) + session.errorTables[t];
+  Object.keys(session.errorTables).forEach(function(k) {
+    totalsPerTable[k] = (totalsPerTable[k] || 0) + session.errorTables[k];
   });
   renderResultChart('goChart', session.errorTables, totalsPerTable);
 
@@ -859,8 +1369,8 @@ function tryTeacherLogin() {
 }
 
 function openTeacherPanel() {
-  document.querySelectorAll('.teacher-tab').forEach(function(t) {
-    t.classList.toggle('active', t.dataset.tab === 'stats');
+  document.querySelectorAll('.teacher-tab').forEach(function(tab) {
+    tab.classList.toggle('active', tab.dataset.tab === 'stats');
   });
   $('teacherStats').classList.remove('hidden');
   $('teacherData').classList.add('hidden');
@@ -881,9 +1391,9 @@ function populateTeacherStats() {
   var chart = $('tmTablesChart');
   chart.innerHTML = '';
   var hasData = false;
-  for (var t = 1; t <= 9; t++) {
-    var errs  = state.errorMap[t]   || 0;
-    var succ  = state.successMap[t] || 0;
+  for (var tbl = 1; tbl <= 9; tbl++) {
+    var errs  = state.errorMap[tbl]   || 0;
+    var succ  = state.successMap[tbl] || 0;
     var total = errs + succ;
     if (!total) continue;
     hasData = true;
@@ -891,25 +1401,26 @@ function populateTeacherStats() {
     var row = document.createElement('div');
     row.className = 'result-chart-row';
     row.innerHTML =
-      '<div class="result-chart-label">× ' + t + '</div>' +
+      '<div class="result-chart-label">× ' + tbl + '</div>' +
       '<div class="result-chart-bar"><div class="result-chart-fill' +
         (errs === 0 ? ' no-errors' : '') + '" style="width:' + (errs === 0 ? 8 : errPct) + '%"></div></div>' +
       '<div class="result-chart-count' + (errs === 0 ? ' zero' : '') + '">' + errs + '/' + total + '</div>';
     chart.appendChild(row);
   }
   if (!hasData) {
-    chart.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:10px;">Sem dados ainda.</div>';
+    chart.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:10px;">' + t('noDataYet') + '</div>';
   }
 
   var list = $('tmSessionList');
   list.innerHTML = '';
   if (!sessions.length) {
-    list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:10px;">Sem sessões registradas.</div>';
+    list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:10px;">' + t('noSessions') + '</div>';
   } else {
     sessions.slice(0, 5).forEach(function(s) {
       var d = new Date(s.date);
-      var dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-      var modeStr = s.mode === 'hardmode' ? '🏋️ Gym Leader' : '🗺️ Aventura';
+      var locale = state.lang === 'en' ? 'en-US' : 'pt-BR';
+      var dateStr = d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      var modeStr = s.mode === 'hardmode' ? '🏋️ ' + t('modeHardTitle') : '🗺️ ' + t('modeAdventureTitle');
       var row = document.createElement('div');
       row.style.cssText = 'padding:7px 10px;background:var(--gray-light);border-radius:8px;margin-bottom:4px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;';
       row.innerHTML = '<span><strong>' + dateStr + '</strong> · ' + modeStr + '</span>' +
@@ -927,7 +1438,7 @@ function exportProgress() {
   a.download = 'tabuada-pokemon-sofia-' + new Date().toISOString().slice(0, 10) + '.json';
   a.click();
   URL.revokeObjectURL(url);
-  showToast('✅ Progresso exportado!');
+  showToast(t('exportSuccess'));
 }
 
 function importProgress(file) {
@@ -941,11 +1452,11 @@ function importProgress(file) {
         renderPokedex();
         renderBadges();
         populateTeacherStats();
-        showToast('✅ Progresso importado!');
+        showToast(t('importSuccess'));
       } else {
-        showToast('❌ Arquivo inválido.');
+        showToast(t('importInvalid'));
       }
-    } catch(_) { showToast('❌ Erro ao ler arquivo.'); }
+    } catch(_) { showToast(t('importError')); }
   };
   reader.readAsText(file);
 }
@@ -959,7 +1470,7 @@ function resetAllData() {
   renderBadges();
   populateTeacherStats();
   $('tmResetConfirm').classList.remove('visible');
-  showToast('🗑️ Tudo resetado.');
+  showToast(t('resetSuccess'));
 }
 
 // ── Mode selector ─────────────────────────────────────────────
@@ -973,19 +1484,11 @@ function selectMode(mode) {
   });
   var rules = $('modeRules');
   if (mode === 'hardmode') {
-    rules.innerHTML = '<strong>Modo Gym Leader:</strong><ul>' +
-      '<li>Cronômetro de <strong>10 segundos</strong> por conta</li>' +
-      '<li>60% das contas são <strong>divisões</strong></li>' +
-      '<li>Maior chance de <strong>✨ Shiny!</strong></li>' +
-      '<li>Errou <strong>10 vezes</strong>? Game Over!</li></ul>';
-    $('startBtn').textContent = 'Desafiar o Gym Leader!';
+    rules.innerHTML = t('hardRulesHTML');
+    $('startBtn').textContent = t('startHardBtn');
   } else {
-    rules.innerHTML = '<strong>Modo Aventura:</strong><ul>' +
-      '<li>Contas infinitas de multiplicação e divisão</li>' +
-      '<li>Acertou? <strong>Capturou o Pokémon!</strong></li>' +
-      '<li>10 seguidas = próximo Pokémon é <strong>✨ SHINY!</strong></li>' +
-      '<li>Errou <strong>10 vezes</strong>? Game Over!</li></ul>';
-    $('startBtn').textContent = 'Começar Aventura!';
+    rules.innerHTML = t('adventureRulesHTML');
+    $('startBtn').textContent = t('startAdvBtn');
   }
 }
 
@@ -994,13 +1497,83 @@ function updateMuteBtn() {
   $('muteBtn').classList.toggle('active', state.settings.muted);
 }
 
+// ── Language ──────────────────────────────────────────────────
+
+function applyLang() {
+  // Static text via data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
+    el.innerHTML = t(el.getAttribute('data-i18n-html'));
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
+  });
+
+  // Toggle button labels (shows the OTHER language)
+  var label = state.lang === 'pt' ? 'EN' : 'PT';
+  var b1 = document.getElementById('langBtn');       if (b1) b1.textContent = label;
+  var b2 = document.getElementById('langBtnStart');  if (b2) b2.textContent = label;
+
+  // <html lang> for accessibility
+  document.documentElement.lang = state.lang === 'pt' ? 'pt-BR' : 'en';
+  document.title = t('appTitle');
+
+  // Re-render dynamic UI: badges (tooltips), pokédex (count label stays), rules HTML
+  renderBadges();
+  if (typeof selectMode === 'function' && typeof selectedMode !== 'undefined') {
+    selectMode(selectedMode);
+  }
+  // If pokémon detail modal is open, refresh its description + type badges
+  var pdOverlay = document.getElementById('pokemonDetailOverlay');
+  if (pdOverlay && pdOverlay.style.display === 'flex') {
+    var numTxt = document.getElementById('pdNum').textContent || '#000';
+    var pid = parseInt(numTxt.replace('#',''), 10);
+    if (pid) {
+      document.getElementById('pdDesc').textContent = getDesc(pid) || t('noDesc');
+      var cached = state.pokemonCache[pid];
+      if (cached) renderTypeBadges(document.getElementById('pdTypes'), cached.types);
+    }
+  }
+  // Re-render current encounter's type badge (in active gameplay)
+  if (typeof session !== 'undefined' && session && session.currentPokemonId) {
+    var encCached = state.pokemonCache[session.currentPokemonId];
+    var encTypes  = document.getElementById('pokemonTypes');
+    if (encCached && encTypes) renderTypeBadges(encTypes, encCached.types);
+  }
+  // If teacher panel is open, repopulate stats
+  if (document.getElementById('teacherOverlay').style.display === 'flex') {
+    populateTeacherStats();
+  }
+}
+
+function setLang(lang) {
+  if (lang !== 'pt' && lang !== 'en') return;
+  state.lang = lang;
+  save();
+  applyLang();
+}
+
+function toggleLang() {
+  setLang(state.lang === 'pt' ? 'en' : 'pt');
+}
+
 // ── Init ──────────────────────────────────────────────────────
 
 function init() {
+  applyLang();
   renderPokedex();
   renderBadges();
   updateMuteBtn();
   selectMode('adventure');
+
+  // Language toggle
+  var langBtn = document.getElementById('langBtn');
+  if (langBtn) langBtn.addEventListener('click', toggleLang);
+  var langBtnStart = document.getElementById('langBtnStart');
+  if (langBtnStart) langBtnStart.addEventListener('click', toggleLang);
 
   $('startOverlay').style.display    = 'flex';
   $('playArea').style.display        = 'none';
@@ -1028,7 +1601,7 @@ function init() {
 
   // Home mid-game
   $('homeBtn').addEventListener('click', function() {
-    if (session && !confirm('Voltar ao menu? Sua sessão vai ser perdida.')) return;
+    if (session && !confirm(t('leaveSessionConfirm'))) return;
     clearTimer();
     showStartScreen();
   });
@@ -1070,7 +1643,7 @@ function init() {
 
   document.querySelectorAll('.teacher-tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
-      document.querySelectorAll('.teacher-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.teacher-tab').forEach(function(tt) { tt.classList.remove('active'); });
       tab.classList.add('active');
       var target = tab.dataset.tab;
       $('teacherStats').classList.toggle('hidden', target !== 'stats');
